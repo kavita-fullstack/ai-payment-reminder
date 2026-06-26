@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# React
+frontend/node_modules/
+frontend/build/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment
+.env
+
+# React build served by FastAPI
+backend/frontend_build/
