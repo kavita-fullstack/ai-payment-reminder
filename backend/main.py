@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
+import uvicorn
 
 load_dotenv()
 Base.metadata.create_all(bind=engine)
@@ -20,7 +21,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -41,19 +42,6 @@ async def startup_event():
     print("   Swagger Docs: http://localhost:8000/docs")
     print("   Frontend:     http://localhost:3000\n")
 
-@app.get("/")
-def root():
-    return {
-        "message": "AI Payment Reminder Assistant API",
-        "status": "running",
-        "version": "1.0.0",
-        "docs": "http://localhost:8000/docs"
-    }
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
-
 # Mount the React build folder 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -70,6 +58,12 @@ if os.path.exists(frontend_build):
         name="static"
     )
 
+    @app.get("/")
+    async def serve_root():
+        return FileResponse(
+            os.path.join(frontend_build, "index.html")
+    )
+
     @app.get("/{full_path:path}")
     async def serve_react(full_path: str):
 
@@ -79,10 +73,14 @@ if os.path.exists(frontend_build):
             "redoc",
             "openapi.json"
         )
-
+    
         if full_path.startswith(api_prefixes):
-            return
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404)
 
         return FileResponse(
             os.path.join(frontend_build, "index.html")
         )
+    
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
