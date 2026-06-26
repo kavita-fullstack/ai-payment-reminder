@@ -9,8 +9,8 @@ npm install
 echo "Building React..."
 npm run build
 
-cd ..
+cd ../backend
 
 echo "Installing backend dependencies..."
-cd backend
+python -m pip install --upgrade pip
 pip install -r requirements.txt
